@@ -1,0 +1,130 @@
+{
+  "name": "poc-dotnet-api-guardian",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -48
+      ],
+      "id": "382c648a-3916-4a9d-8277-b1354c23afa1",
+      "name": "Déclencheur"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:5000/api/weather/rabat",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        -48
+      ],
+      "id": "81e5236c-1663-47e4-b898-3ae4e7583fe1",
+      "name": "Appel Api .NET pour la Méteo"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "673e1d80-37ee-4954-a14a-76ea04cdb3ba",
+              "leftValue": "={{ $json.MeteoRabat.main.temp_min }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        272,
+        -48
+      ],
+      "id": "0db1cc5e-6c4a-4bb7-a390-fb4c0703cca6",
+      "name": "Si la Temperature < 10 °"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"Meteo{{$json.name}}\": {{ $json }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        -48
+      ],
+      "id": "b6adae3e-9a1d-4fdb-938e-15332fe0a6b8",
+      "name": "Transformation"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Déclencheur": {
+      "main": [
+        [
+          {
+            "node": "Appel Api .NET pour la Méteo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Appel Api .NET pour la Méteo": {
+      "main": [
+        [
+          {
+            "node": "Transformation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transformation": {
+      "main": [
+        [
+          {
+            "node": "Si la Temperature < 10 °",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fcd8f7d7-112c-4f7b-b050-a2414d07f969",
+  "meta": {
+    "instanceId": "4dd90c51fbbfa5405e494d2baadaf51dcc02136f99bb2d16f593122030451d15"
+  },
+  "id": "4fZgGU4dbv2Swo81",
+  "tags": []
+}
